@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panimalar Engineering College - AQAR Data Management Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .preview-card { border-left: 4px solid #3B82F6; }
+        .dashboard-card { transition: all 0.3s ease; }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"],
+        .form-group input[type="email"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-group input[type="file"] { width: 100%; padding: 0.5rem 0; }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-800">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Panimalar Engineering College</h1>
+                <p class="text-gray-600 mt-2">AQAR Data Management Portal</p>
+            </div>
+
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your username" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter your password" required>
+                </div>
+
+                <div id="department-select" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Department</label>
+                    <select id="department" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select Department</option>
+                        <option value="CSE">Computer Science and Engineering</option>
+                        <option value="ECE">Electronics and Communication Engineering</option>
+                        <option value="EEE">Electrical and Electronics Engineering</option>
+                        <option value="MECH">Mechanical Engineering</option>
+                        <option value="IT">Information Technology</option>
+                        <option value="AI&DS">Artificial Intelligence & Data Science</option>
+                        <option value="AIML">Artificial Intelligence & Machine Learning</option>
+                        <option value="CSBS">Computer Science and Business Systems</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                    Login
+                </button>
+
+                <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Portal -->
+    <div id="main-portal" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-800">AQAR Portal</h1>
+                            <p class="text-sm text-gray-600" id="user-info">Welcome</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="department-badge" class="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full hidden"></span>
+                        <button id="logout-btn" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-200 transition duration-200">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Faculty Dashboard -->
+            <div id="faculty-dashboard" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-8">Faculty Dashboard</h2>
+                <p class="text-gray-600">Faculty dashboard content goes here...</p>
+            </div>
+
+            <!-- HOD Dashboard -->
+            <div id="hod-dashboard" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-8">HOD Dashboard</h2>
+                <p class="text-gray-600">HOD dashboard content goes here...</p>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" class="hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-8">Admin Dashboard</h2>
+                <p class="text-gray-600">Admin dashboard content goes here...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        const users = {
+            'admin': { password: 'admin@123', role: 'admin', department: '' },
+            'hod': { password: 'hod@123', role: 'hod', department: 'CSE' },
+            'faculty': { password: 'faculty@123', role: 'faculty', department: 'CSE' }
+        };
+        let currentUser = null;
+        let allSubmissions = []; // ✅ FIX: initialize submissions
+
+        const loginScreen = document.getElementById('login-screen');
+        const mainPortal = document.getElementById('main-portal');
+        const loginForm = document.getElementById('login-form');
+        const departmentSelectDiv = document.getElementById('department-select');
+        const loginError = document.getElementById('login-error');
+        const userInfo = document.getElementById('user-info');
+        const departmentBadge = document.getElementById('department-badge');
+
+        const facultyDashboard = document.getElementById('faculty-dashboard');
+        const hodDashboard = document.getElementById('hod-dashboard');
+        const adminDashboard = document.getElementById('admin-dashboard');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const departmentDropdown = document.getElementById('department');
+            const selectedDepartment = departmentDropdown ? departmentDropdown.value : '';
+
+            if (users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    role: users[username].role,
+                    department: users[username].role === 'faculty' ? selectedDepartment : users[username].department
+                };
+
+                if (currentUser.role === 'faculty' && !currentUser.department) {
+                    showError('Please select your department.');
+                    departmentSelectDiv.classList.remove('hidden'); // ✅ FIX: show department selector for faculty
+                    return;
+                }
+
+                if (users[username].role === 'hod') {
+                    currentUser.department = users[username].department;
+                } else if (users[username].role === 'admin') {
+                    currentUser.department = '';
+                }
+
+                showDashboard();
+            } else {
+                showError('Invalid username or password');
+            }
+        });
+
+        function showError(message) {
+            loginError.textContent = message;
+            loginError.classList.remove('hidden');
+            setTimeout(() => loginError.classList.add('hidden'), 3000);
+        }
+
+        function showDashboard() {
+            loginScreen.classList.add('hidden');
+            mainPortal.classList.remove('hidden');
+
+            userInfo.textContent = `Welcome, ${currentUser.username} (${currentUser.role.toUpperCase()})`;
+            if (currentUser.department) {
+                departmentBadge.textContent = currentUser.department;
+                departmentBadge.classList.remove('hidden');
+            } else {
+                departmentBadge.classList.add('hidden');
+            }
+
+            facultyDashboard.classList.add('hidden');
+            hodDashboard.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+
+            if (currentUser.role === 'faculty') {
+                facultyDashboard.classList.remove('hidden');
+            } else if (currentUser.role === 'hod') {
+                hodDashboard.classList.remove('hidden');
+            } else if (currentUser.role === 'admin') {
+                adminDashboard.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            currentUser = null;
+            mainPortal.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('department').value = '';
+            departmentSelectDiv.classList.add('hidden');
+        });
+
+        function downloadOverallFacultyExcel() {
+            const submissionsToExport = allSubmissions;
+            if (submissionsToExport.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+
+            const formattedData = submissionsToExport.map(submission => ({
+                'Faculty Name': submission.faculty,
+                'Department': submission.department,
+                'Category': submission.category,
+                'Submission Date': submission.date
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(formattedData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "All Submissions");
+            XLSX.writeFile(wb, "All_Faculty_Submissions.xlsx");
+        }
+    </script>
+</body>
+</html>
+
+
+
